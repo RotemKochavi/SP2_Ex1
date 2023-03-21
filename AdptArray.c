@@ -72,7 +72,7 @@ Result SetAdptArrayAt(PAdptArray pArray, int index, PElement pNewElement)
         memcpy(newpElemArr,pArray->pElemArr,pArray->ArrSize*sizeof(PElement));
         free (pArray -> pElemArr);
         pArray -> pElemArr = newpElemArr;
-        (pArray -> pElemArr)[index]== pArray->copyfunc(pNewElement);
+        (pArray -> pElemArr)[index] = pArray->copyfunc(pNewElement);
     }
 
     if( index >= pArray -> ArrSize)
