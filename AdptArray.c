@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "AdptArray.h"
 
 typedef struct AdptArray_
@@ -31,7 +32,7 @@ PAdptArray CreateAdptArray(COPY_FUNC copyfunc , DEL_FUNC delfunc,PRINT_FUNC prin
 void DeleteAdptArray(PAdptArray pArray)
 {
     if(pArray == NULL)
-        return NULL;
+        return;
     
     else if(pArray -> pElemArr)
     {
@@ -39,7 +40,7 @@ void DeleteAdptArray(PAdptArray pArray)
         {
             if(pArray ->pElemArr[i])
             {
-                pArray -> delfund(pArray -> pElemArr[i]);
+                pArray -> delfunc(pArray -> pElemArr[i]);
             }
         }
         free(pArray -> pElemArr);
@@ -55,33 +56,23 @@ Result SetAdptArrayAt(PAdptArray pArray, int index, PElement pNewElement)
 
     if( index < pArray -> ArrSize )
     {
-        PElement oldElemArr = pArray -> pElemArr[index];
-        if (oldElemArr)
+        if ((pArray -> pElemArr)[index])
         {
-            pArray -> delfunc(oldElemArr);
+            pArray -> delfunc((pArray -> pElemArr)[index]);
         }
-        pArray -> pElemArr[index] = pArray->copyfunc(pNewElement);
+        (pArray -> pElemArr)[index] = pArray->copyfunc(pNewElement);
     }
 
     else
     {
-        PElement *newpElemArr = (PElement*)calloc((index+1), sizeof(Pelement));
+        PElement *newpElemArr = (PElement*)calloc((index+1), sizeof(PElement));
         if (!newpElemArr)
             return FAIL;
 
-        if(pArray -> pElemArr)
-        {
-            for (int i=0; i< pArray -> ArrSize; i++)
-            {
-                if(pArray -> pElemArr[i] != NULL)
-                {
-                    newpElemArr[i] = pArray -> copyfunc(pArray -> pElemArr[i]);
-                    pArray -> delfunc(pArray -> pElemArr[i]);
-                }
-            }
-        }
-         free (pArray -> pElemArr);
-         pArray -> pElemArr = newpElemArr;
+        memcpy(newpElemArr,pArray->pElemArr,pArray->ArrSize*sizeof(PElement));
+        free (pArray -> pElemArr);
+        pArray -> pElemArr = newpElemArr;
+        (pArray -> pElemArr)[index]== pArray->copyfunc(pNewElement);
     }
 
     if( index >= pArray -> ArrSize)
@@ -97,10 +88,12 @@ PElement GetAdptArrayAt(PAdptArray pArray, int index)
 {
     if( pArray == NULL)
         return NULL;
-    if(index < 0 || pArray -> ArrSize <= index || adptArray->arr[index] == NULL)
+    if(pArray -> ArrSize <= index)
+        return NULL;
+    if(pArray->pElemArr[index] == NULL)
         return NULL;
     
-    return (pArray -> copyfunc(pArray -> pElemArr[index]));
+    return (pArray -> copyfunc((pArray -> pElemArr)[index]));
 }
 
 /*  return the size of array  */
